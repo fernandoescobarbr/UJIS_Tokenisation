@@ -1,0 +1,19 @@
+{
+  "name": "ujis-ts",
+  "version": "9.0.0",
+  "description": "Proof-of-concept of Hyperledger Fabric chaincode for recording systems unavailability",
+  "main": "index.js",
+  "scripts": {
+    "start": "fabric-chaincode-node start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Fernando Escobar",
+  "license": "ISC",
+  "engines": { "node": ">=16" },
+  "type": "commonjs",
+  "dependencies": {
+    "fabric-contract-api": "^2.5.8",
+    "fabric-shim": "^2.5.8"
+  }
+}
