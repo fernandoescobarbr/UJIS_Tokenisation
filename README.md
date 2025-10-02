@@ -46,21 +46,67 @@ docs/             # Documentation assets (e.g., system_diagram.png)
 
 ## 4) Quick start
 
-### 4.1 Deploy the chaincode (Node.js/TS)
+### 4.1 Create the test network
+Follow the instructions from https://hyperledger-fabric.readthedocs.io/en/latest/test_network.html (acessed in September, 2025)
 
-From `ujis-ts/` (commands below are indicative—adapt to your network tooling):
+```bash
+./network.sh up createChannel -c ujis-channel -ca    
+```
+
+### Deploy the chaincode (Node.js/TS)
+
+From `ujis-ts/` directory (commands below are indicative—adapt to your network tooling):
 
 ```bash
 # build/prepare chaincode (adjust scripts as per ujis-ts package.json)
-npm ci
-npm run build
+npm install
+```
 
+From `test-network/` directory
+
+```bash
 # package, install, approve, commit on your channel
 # (use your standard Fabric workflow; names below are placeholders)
-peer lifecycle chaincode package basic.tar.gz --path . --lang node --label basic_1
-# peer lifecycle chaincode install …
-# peer lifecycle chaincode approveformyorg …
-# peer lifecycle chaincode commit -C ujis-channel -n basic …
+# package
+peer lifecycle chaincode package basic.tar.gz --path ../ujis/ujis-ts/ --lang node --label basic_1.0
+
+# install on peer0 - org1
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID=Org1MSP
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_ADDRESS=localhost:7051
+
+peer lifecycle chaincode install basic.tar.gz
+
+# install on peer0 - org2
+export CORE_PEER_LOCALMSPID=Org2MSP
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+export CORE_PEER_ADDRESS=localhost:9051
+
+peer lifecycle chaincode install basic.tar.gz
+
+# approve chaincode - org1
+peer lifecycle chaincode queryinstalled # to know the <PACKAGE_ID>
+
+export CC_PACKAGE_ID=<PACKAGE_ID>
+
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID ujis-channel --name basic --version 1.0 --package-id $CC_PACKAGE_ID --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+# approve chaincode - org2
+export CORE_PEER_LOCALMSPID=Org1MSP
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export CORE_PEER_ADDRESS=localhost:7051
+
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID ujis-channel --name basic --version 1.0 --package-id $CC_PACKAGE_ID --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+# to verify, in both organisations
+peer lifecycle chaincode checkcommitreadiness --channelID ujis-channel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --output json
+
+# commit, in both organisations
+peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID ujis-channel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" 
 ```
 
 ### 4.2 Configure and run the Laravel app
