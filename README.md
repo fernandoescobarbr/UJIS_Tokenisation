@@ -1,6 +1,6 @@
 # UJIS — Tokenisation of the Unavailability of Judicial Information Systems (Implementation)
 
-> **Implementation repository** for recording, certifying, and verifying **system unavailability** events on a **private Hyperledger Fabric** network.  
+> **Implementation repository** for recording, certifying, and verifying **system unavailability** events on a **private Hyperledger Fabric** test-network.  
 > Backend/API and lightweight UI are built with **PHP/Laravel**; smart contracts are **Node.js (TypeScript)** chaincode. This codebase underpins the implementation described in the paper **“Tokenisation of the Unavailability of Judicial Information Systems – From Assessment to Implementation.”**
 
 ![System Architecture](docs/system_diagram.png)
