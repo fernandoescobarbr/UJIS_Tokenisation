@@ -53,16 +53,18 @@ Follow the instructions from https://hyperledger-fabric.readthedocs.io/en/latest
 ./network.sh up createChannel -c ujis-channel -ca    
 ```
 
-### Deploy the chaincode (Node.js/TS)
+### 4.2 Deploy the chaincode (Node.js/TS)
 
-From `ujis-ts/` directory (commands below are indicative—adapt to your network tooling):
+(commands below are indicative—adapt to your network tooling)
+
+From `ujis-ts/` directory:
 
 ```bash
 # build/prepare chaincode (adjust scripts as per ujis-ts package.json)
 npm install
 ```
 
-From `test-network/` directory
+From `test-network/` directory:
 
 ```bash
 # package, install, approve, commit on your channel
@@ -109,9 +111,9 @@ peer lifecycle chaincode checkcommitreadiness --channelID ujis-channel --name ba
 peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID ujis-channel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" 
 ```
 
-### 4.2 Configure and run the Laravel app
+### 4.3 Configure and run the Laravel app
 
-From `ujis-api_ui/`:
+From `ujis-api_ui/` directory:
 
 ```bash
 composer install
@@ -217,34 +219,16 @@ Payloads are intentionally simple JSON to reduce coupling and enable gradual ado
 
 ## 8) Operations & troubleshooting
 
-- The **FabricService** shells into your Fabric environment (`envVar.sh` + `setGlobals N`), exports `PATH` and `FABRIC_CFG_PATH`, and then runs the `peer` CLI. Errors will include the CLI’s stderr if configuration is incorrect (paths, channel, chaincode name, TLS flags).  
+- The **FabricService** shells into your Fabric environment (`envVar.sh` + `setGlobals N`), exports `PATH` and `FABRIC_CFG_PATH`, and then runs the `peer` CLI. Errors will include the CLI’s stderr if the configuration is incorrect (paths, channel, chaincode name, TLS flags).  
 - Output sanitisation removes ANSI colour codes and extracts the **first valid JSON block** from noisy logs.  
 - If verification shows “not found”, ensure the **`startTime` in the URL matches exactly** the key used at write time (it is part of the composite key).  
 - For long invokes, adjust `FABRIC_WAIT_TIMEOUT` (seconds). The wrapper adds a safety margin to the process timeout.
 
 ---
 
-## 9) Security notes
+## 9) Licence
 
-- **Do not commit** private keys (`*.key`, `*.p12`, `*.pfx`, `*.jks`) or your `.env`. Use environment variables/secrets in CI.  
-- Public certificates (`.cer/.crt` **without** private key) can be versioned if useful for verification in test environments.  
-- Confirm any committed certificate is **public‑only** (`openssl x509 -in cert.cer -noout -text`) and never contains a “PRIVATE KEY” block.
-
----
-
-## 10) Roadmap (suggested)
-
-- Pagination and cursor‑based scans for large ledgers.  
-- Optional off‑chain cache for API latency under load.  
-- Containerised packaging (Docker) with runtime secret mounts.  
-- OpenAPI/Swagger for the REST surface.  
-- Formal CA chain and trust distribution for Adobe/OS validation in production.
-
----
-
-## 11) Licence
-
-MIT (or your institution’s required licence). See `LICENSE` if present.
+Creative Commons Attribution Share-Alike - CC BY-SA 4.0
 
 ---
 
