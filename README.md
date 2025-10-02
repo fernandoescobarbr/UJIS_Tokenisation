@@ -12,7 +12,7 @@
 This repository provides:
 
 - **Laravel application** (UI + REST API):
-  - **UI (Blade)** to browse unavailability records, view details, and **issue digitally‑signed PDF certificates** with QR/verification URL.
+  - **UI (Blade)** to browse unavailability records, view details, and **issue digitally‑signed PDF certificates** with QR Code/verification URL.
   - **REST API** that maps 1:1 to chaincode: list, detail, record, integrity check.
 - **Fabric CLI wrapper** (`App\Services\FabricService`) that prepares the Fabric test‑network environment and runs `peer chaincode query/invoke` with the full TLS flags.
 - Configuration for **local certificate signing** (TCPDF signature via PEM cert/key) and a **verification page** that consumes the API to display existence & integrity outcomes.
